@@ -7,3 +7,9 @@ class NotStartedException(message: String = "발급이 아직 시작되지 않�
 class SoldOutException(message: String = "쿠폰이 모두 소진되었습니다") : RuntimeException()
 
 class AlreadyIssuedException(message: String = "이미 발급된 쿠폰입니다") : RuntimeException()
+
+class IssuanceNotFoundException(message: String = "발급 정보를 찾을 수 없습니다") : RuntimeException()
+
+class AlreadyUsedException(message: String = "이미 사용된 쿠폰입니다") : RuntimeException()
+
+class ExpiredException(message: String = "만료된 쿠폰입니다") : RuntimeException()

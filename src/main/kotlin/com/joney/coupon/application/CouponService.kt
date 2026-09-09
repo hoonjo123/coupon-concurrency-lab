@@ -9,8 +9,8 @@ import com.joney.coupon.support.AlreadyIssuedException
 import com.joney.coupon.support.CouponNotFoundException
 import com.joney.coupon.support.NotStartedException
 import com.joney.coupon.support.SoldOutException
-import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
