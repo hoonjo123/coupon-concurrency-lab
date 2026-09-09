@@ -1,15 +1,25 @@
 package com.joney.coupon.support
 
-class CouponNotFoundException(message: String = "쿠폰 정보를 찾을 수 없습니다") : RuntimeException()
+import org.springframework.http.HttpStatus
 
-class NotStartedException(message: String = "발급이 아직 시작되지 않았습니다") : RuntimeException()
+sealed class DomainException(
+    val code: String,
+    val httpStatus: HttpStatus,
+    message: String,
+    ) : RuntimeException(message)
 
-class SoldOutException(message: String = "쿠폰이 모두 소진되었습니다") : RuntimeException()
+class CouponNotFoundException(message: String = "쿠폰 정보를 찾을 수 없습니다") : DomainException("COUPON_NOT_FOUND", HttpStatus.NOT_FOUND, message)
 
-class AlreadyIssuedException(message: String = "이미 발급된 쿠폰입니다") : RuntimeException()
+class NotStartedException(message: String = "발급이 아직 시작되지 않았습니다") : DomainException("NOT_STARTED", HttpStatus.CONFLICT, message)
 
-class IssuanceNotFoundException(message: String = "발급 정보를 찾을 수 없습니다") : RuntimeException()
+class SoldOutException(message: String = "쿠폰이 모두 소진되었습니다") : DomainException("SOLD_OUT", HttpStatus.CONFLICT, message)
 
-class AlreadyUsedException(message: String = "이미 사용된 쿠폰입니다") : RuntimeException()
+class AlreadyIssuedException(message: String = "이미 발급된 쿠폰입니다") : DomainException("ALREADY_ISSUED", HttpStatus.CONFLICT, message)
 
-class ExpiredException(message: String = "만료된 쿠폰입니다") : RuntimeException()
+class IssuanceNotFoundException(message: String = "발급 정보를 찾을 수 없습니다") : DomainException("ISSUANCE_NOT_FOUND", HttpStatus.NOT_FOUND, message)
+
+class AlreadyUsedException(message: String = "이미 사용된 쿠폰입니다") : DomainException("ALREADY_USED", HttpStatus.CONFLICT, message)
+
+class NotOwnerException(message: String = "본인의 쿠폰이 아닙니다") : DomainException("NOT_OWNER", HttpStatus.FORBIDDEN, message)
+
+class ExpiredException(message: String = "만료된 쿠폰입니다") : DomainException("EXPIRED", HttpStatus.CONFLICT, message)
