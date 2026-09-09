@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.springframework.cglib.core.Local
 import java.time.LocalDateTime
 
 @Entity
@@ -25,7 +26,7 @@ class Coupon(
     @Column(nullable = false)
     var validityDays: Int = 7,
 
-    var startsAt: LocalDateTime = LocalDateTime.now(),
+    var startsAt: LocalDateTime? = LocalDateTime.now(),
 
     @Column(nullable = false, updatable = false)
     var createdAt: LocalDateTime = LocalDateTime.now(),
@@ -34,4 +35,8 @@ class Coupon(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 ) {
+    fun isBookingOpen(now: LocalDateTime): Boolean =
+        startsAt?.let { !now.isBefore(it) } ?: true
+
+    fun isSoldOut(): Boolean = issuedQuantity >= totalQuantity
 }
