@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "4.1.0"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "2.3.21"
+    id("com.google.cloud.tools.jib") version "3.5.1"
 }
 
 group = "com.joney"
@@ -48,4 +49,24 @@ allOpen {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+jib {
+    from {
+        image = "eclipse-temurin:25-jre"
+        platforms {
+            platform {
+                architecture = "amd64"
+                os = "linux"
+            }
+        }
+    }
+    to {
+        image = "coupon-service"
+        tags = setOf("latest", project.version.toString())
+    }
+    container {
+        ports = listOf("8080")
+        creationTime.set("USE_CURRENT_TIMESTAMP")
+    }
 }
