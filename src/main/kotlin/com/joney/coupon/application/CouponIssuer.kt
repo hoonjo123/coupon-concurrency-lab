@@ -19,7 +19,7 @@ class CouponIssuer(
     fun tryIssue(couponId: Long) {
         val raw = redisTemplate.execute(
             script,
-            listOf()
+            listOf(stockKey(couponId))
         ) ?: error("?Lua 스크립트 결과가 null입니다")
 
         when (raw) {

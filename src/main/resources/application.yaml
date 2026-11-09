@@ -13,13 +13,17 @@ spring:
     hibernate:
       ddl-auto: update
     open-in-view: false
-    show-sql: true
+    # 부하 테스트 시 stdout 동기 IO가 응답  latency에 박히므로 끔.
+    # 로컬 디버깅이 필요하면 일시적으로 true로 바꿔서 확인하겠음.
+    show-sql: false
   mvc:
     problemdetails:
       enabled: true
 
   logging:
     level:
-      com.apiece.coupon: DEBUG
-      org.hibernate.SQL: DEBUG
-      org.hibernate.orm.jdbc.bind: TRACE
+      # 위와 같은 이유로 부하 측정용 로그 레벨 설정함.
+      # 디버깅 시, DEBUG/TRACE 로 일시적으로 상향할 예정
+      com.apiece.coupon: INFO
+      org.hibernate.SQL: WARN
+      org.hibernate.orm.jdbc.bind: WARN
