@@ -5,7 +5,7 @@ import com.joney.coupon.domain.IssuanceStatus
 import java.time.LocalDateTime
 
 class IssuanceResponse(
-    var id: Long,
+    var id: Long?,
     var userId: Long,
     var couponId: Long,
     var status: IssuanceStatus,
@@ -15,7 +15,7 @@ class IssuanceResponse(
 ) {
     companion object {
         fun from(issuance: Issuance): IssuanceResponse = IssuanceResponse(
-            id = requireNotNull(issuance.id),
+            id = issuance.id,
             userId = issuance.userId,
             couponId = issuance.couponId,
             status = issuance.status,
