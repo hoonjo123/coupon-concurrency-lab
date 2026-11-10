@@ -24,4 +24,4 @@ class NotOwnerException(message: String = "본인의 쿠폰이 아닙니다") : 
 
 class ExpiredException(message: String = "만료된 쿠폰입니다") : DomainException("EXPIRED", HttpStatus.CONFLICT, message)
 
-class QueueFullException(message: String = "발급 큐가 일시적으로 가득 찼습니다") : DomainException("QUEUE_FULL", HttpStatus.SERVICE_UNAVAILABLE, message)
+//class QueueFullException(message: String = "발급 큐가 일시적으로 가득 찼습니다") : DomainException("QUEUE_FULL", HttpStatus.SERVICE_UNAVAILABLE, message)

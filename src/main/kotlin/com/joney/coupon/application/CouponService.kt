@@ -11,6 +11,7 @@ import com.joney.coupon.support.AlreadyIssuedException
 import com.joney.coupon.support.CouponNotFoundException
 import com.joney.coupon.support.NotStartedException
 import com.joney.coupon.support.SoldOutException
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -21,7 +22,9 @@ class CouponService(
 //    더이상 해당 DB에 접근하지 않음으로 주석처리
 //    private val issuanceRepository: IssuanceRepository,
     private val couponIssuer: CouponIssuer,
-    private val issuanceQueue: InMemoryIssuanceQueue,
+//    이벤트 퍼블리셔를 사용할 예정이기에 주석 처리
+//    private val issuanceQueue: InMemoryIssuanceQueue,
+    private val eventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional
     fun createCoupon(request: CreateCouponRequest): Coupon {
@@ -58,7 +61,7 @@ class CouponService(
         couponIssuer.tryIssue(couponId, userId)
 
         val expiredsAt = now.plusDays(coupon.validityDays.toLong())
-        issuanceQueue.enqueue(
+        eventPublisher.publishEvent(
             IssuanceRequested(
                 couponId = couponId,
                 userId = userId,
