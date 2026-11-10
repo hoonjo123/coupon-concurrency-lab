@@ -5,7 +5,7 @@ import com.joney.coupon.domain.Coupon
 import com.joney.coupon.domain.CouponRepository
 import com.joney.coupon.domain.Issuance
 import com.joney.coupon.domain.IssuanceRepository
-import com.joney.coupon.infrastructure.messaging.InMemoryIssuanceQueue
+import com.joney.coupon.infrastructure.messaging.IssuanceRequestProducer
 import com.joney.coupon.infrastructure.messaging.IssuanceRequested
 import com.joney.coupon.support.AlreadyIssuedException
 import com.joney.coupon.support.CouponNotFoundException
@@ -24,7 +24,11 @@ class CouponService(
     private val couponIssuer: CouponIssuer,
 //    이벤트 퍼블리셔를 사용할 예정이기에 주석 처리
 //    private val issuanceQueue: InMemoryIssuanceQueue,
-    private val eventPublisher: ApplicationEventPublisher,
+
+//    카프카 추가됨에 따라 주석처리
+//    private val eventPublisher: ApplicationEventPublisher,
+
+    private val issuanceRequestProducer: IssuanceRequestProducer,
 ) {
     @Transactional
     fun createCoupon(request: CreateCouponRequest): Coupon {
@@ -61,7 +65,7 @@ class CouponService(
         couponIssuer.tryIssue(couponId, userId)
 
         val expiredsAt = now.plusDays(coupon.validityDays.toLong())
-        eventPublisher.publishEvent(
+        issuanceRequestProducer.publish(
             IssuanceRequested(
                 couponId = couponId,
                 userId = userId,

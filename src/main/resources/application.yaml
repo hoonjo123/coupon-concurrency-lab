@@ -13,17 +13,44 @@ spring:
     hibernate:
       ddl-auto: update
     open-in-view: false
-    # 부하 테스트 시 stdout 동기 IO가 응답  latency에 박히므로 끔.
-    # 로컬 디버깅이 필요하면 일시적으로 true로 바꿔서 확인하겠음.
+    # 부하 테스트 시 stdout 동기 IO 가 응답 latency 에 박히므로 끔.
+    # 로컬 디버깅이 필요하면 일시적으로 true 로 바꿔서 확인.
     show-sql: false
   mvc:
     problemdetails:
       enabled: true
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
+#    producer:
+#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+#      # 3으로 설정 시, 응답속도는 지연되지만 안정성은 높다.
+#      acks: "1"
+#    consumer:
+#      group-id: issuance-worker
+#      # 부하 테스트/로컬 편의용. 운영에서는 "latest" 또는 "none" 으로 바꿀 것.
+#      # (현재 KafkaConfig 가 ConsumerFactory 를 직접 만들기 때문에 이 값은 사실상
+#      # 미사용이지만, 의도를 yaml 에도 남겨둔다.)
+#      # earliest: 처음부터 읽기, latest: 가장 최근 offset 부터 읽기, none: group-id 가 없으면 에러
+#      # 운영에서 earliest 로 설정하면, consumer group 이 새로 생성될 때 과거 메시지까지 모두 읽어버리므로 낭비가 발생할 수 있다.
+#      auto-offset-reset: earliest
+#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      # ErrorHandlingDeserializer 로 감싸야 깨진 payload 가 DLT 로 정상 격리된다.
+#      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+#
+#      #보안적인 측면
+#      properties:
+#        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+#        spring.json.trusted.packages: "com.joney.coupon.infrastructure.messaging"
+#        spring.json.value.default.type: com.joney.coupon.infrastructure.messaging.IssuanceRequested
+#    # 스프링 카프카가 제공하는 listening option들
+#    # record로 설정한다는건 메시지 한건 한건 단위로 커밋을 하면 offset을 증가시키겟다라는 의미.
+#    listener:
+#      ack-mode: record
 
-  logging:
-    level:
-      # 위와 같은 이유로 부하 측정용 로그 레벨 설정함.
-      # 디버깅 시, DEBUG/TRACE 로 일시적으로 상향할 예정
-      com.apiece.coupon: INFO
-      org.hibernate.SQL: WARN
-      org.hibernate.orm.jdbc.bind: WARN
+logging:
+  level:
+    # 같은 이유로 부하 측정용 로그 레벨. 디버깅 시 DEBUG/TRACE 로 일시 상향.
+    com.joney.coupon: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.orm.jdbc.bind: WARN
