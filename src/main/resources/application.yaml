@@ -21,6 +21,11 @@ spring:
       enabled: true
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
+
+coupon:
+    cache:
+        ttl-ms: ${COUPON_CACHE_TTL_MS:10000}
+        simulated-load-latency-ms: ${COUPON_CACHE_SIMULATED_LOAD_LATENCY_MS:0}
 #    producer:
 #      key-serializer: org.apache.kafka.common.serialization.StringSerializer
 #      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer

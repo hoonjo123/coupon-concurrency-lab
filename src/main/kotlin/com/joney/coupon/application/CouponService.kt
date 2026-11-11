@@ -2,9 +2,11 @@ package com.joney.coupon.application
 
 import com.joney.coupon.api.dto.CreateCouponRequest
 import com.joney.coupon.domain.Coupon
+import com.joney.coupon.domain.CouponIssuePolicyReader
 import com.joney.coupon.domain.CouponRepository
 import com.joney.coupon.domain.Issuance
 import com.joney.coupon.domain.IssuanceRepository
+import com.joney.coupon.infrastructure.cache.CacheProperties
 import com.joney.coupon.infrastructure.messaging.IssuanceRequestProducer
 import com.joney.coupon.infrastructure.messaging.IssuanceRequested
 import com.joney.coupon.support.AlreadyIssuedException
@@ -28,7 +30,12 @@ class CouponService(
 //    카프카 추가됨에 따라 주석처리
 //    private val eventPublisher: ApplicationEventPublisher,
 
+//    private val cacheProperties: CacheProperties,
+//    private val cacheMetrics: CacheMetrics,
+
     private val issuanceRequestProducer: IssuanceRequestProducer,
+
+    private val couponIssuePolicyReader: CouponIssuePolicyReader,
 ) {
     @Transactional
     fun createCoupon(request: CreateCouponRequest): Coupon {
@@ -46,12 +53,19 @@ class CouponService(
 
     @Transactional
     fun issue(couponId: Long, userId: Long): Issuance {
-        val coupon = couponRepository.findById(couponId)
-            .orElseThrow { CouponNotFoundException() }
+
+        var policy = couponIssuePolicyReader.get(couponId)
+//        cacheMetrics.incrementCouponDbRead()
+        // 다른 리전이라는 가정하에 100ms 정도 지연을 줘서 테스트 할 예정
+//        Thread.sleep(cacheProperties.simulatedLoadLatencyMs)
+//
+//
+//        val coupon = couponRepository.findById(couponId)
+//            .orElseThrow { CouponNotFoundException() }
 
         val now = LocalDateTime.now()
 
-        if (!coupon.isBookingOpen(now)) {
+        if (!policy.isBookingOpen(now)) {
             throw NotStartedException()
         }
 //        if (coupon.isSoldOut()) {
@@ -64,7 +78,7 @@ class CouponService(
 
         couponIssuer.tryIssue(couponId, userId)
 
-        val expiredsAt = now.plusDays(coupon.validityDays.toLong())
+        val expiredsAt = now.plusDays(policy.validityDays.toLong())
         issuanceRequestProducer.publish(
             IssuanceRequested(
                 couponId = couponId,
