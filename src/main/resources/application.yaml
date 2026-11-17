@@ -25,6 +25,7 @@ spring:
 coupon:
     cache:
         ttl-ms: ${COUPON_CACHE_TTL_MS:10000}
+        fresh-ms: ${COUPON_CACHE_FRESH_MS:500}
         simulated-load-latency-ms: ${COUPON_CACHE_SIMULATED_LOAD_LATENCY_MS:0}
 #    producer:
 #      key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -52,6 +53,7 @@ coupon:
 #    # record로 설정한다는건 메시지 한건 한건 단위로 커밋을 하면 offset을 증가시키겟다라는 의미.
 #    listener:
 #      ack-mode: record
+
 
 logging:
   level:
