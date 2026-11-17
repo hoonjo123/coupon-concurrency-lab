@@ -36,6 +36,7 @@ class CouponService(
     private val issuanceRequestProducer: IssuanceRequestProducer,
 
     private val couponIssuePolicyReader: CouponIssuePolicyReader,
+    private val soldOutState: SoldOutState,
 ) {
     @Transactional
     fun createCoupon(request: CreateCouponRequest): Coupon {
@@ -53,6 +54,12 @@ class CouponService(
 
     @Transactional
     fun issue(couponId: Long, userId: Long): Issuance {
+        //매진이면 아무것도 안함
+        // isSoldOut -> caffeine cache 조회, couponId 캐시에 있다면 -> true 응답 -> soldoutexception매진예외
+        // isSoldOut -> caffeine cache 조회, couponId 캐시에 없다면 -> 아래 build 호출 ( 로딩 캐시 ) -> redis의 isFlagged조회 -> 조회해서 return
+        if (soldOutState.isSoldOut(couponId)) {
+            throw SoldOutException()
+        }
 
         var policy = couponIssuePolicyReader.get(couponId)
 //        cacheMetrics.incrementCouponDbRead()

@@ -8,7 +8,7 @@ import org.springframework.data.redis.core.script.RedisScript
 fun listLuaScript(path: String): RedisScript<List<*>> =
     RedisScript.of(ClassPathResource(path), List::class.java)
 
-fun longlistLuaScript(path: String): RedisScript<Long> =
+fun longLuaScript(path: String): RedisScript<Long> =
     RedisScript.of(ClassPathResource(path), Long::class.java)
 
 @Suppress("UNCHECKED_CAST")
